@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  labels:
+    app: jellyfin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      containers:
+      - name: jellyfin
+        image: jellyfin/jellyfin:latest
+        ports:
+        - containerPort: 8096
+        volumeMounts:
+        - name: jellyfin-config
+          mountPath: /config
+        - name: media-movies
+          mountPath: /data/movies
+        - name: media-tv
+          mountPath: /data/tv
+      volumes:
+      - name: jellyfin-config
+        hostPath:
+          path: /var/lib/jellyfin/config # Local path for settings
+          type: DirectoryOrCreate
+      - name: media-movies
+        hostPath:
+          path: /data/media/Movies
+          type: Directory
+      - name: media-tv
+        hostPath:
+          path: /data/media/TV
+          type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin-service
+spec:
+  selector:
+    app: jellyfin
+  type: LoadBalancer # K3s includes 'ServiceLB' to handle this
+  ports:
+  - protocol: TCP
+    port: 8096
+    targetPort: 8096
