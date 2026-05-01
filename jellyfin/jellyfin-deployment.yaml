@@ -31,6 +31,13 @@ spec:
               mountPath: /media/tv
             - name: dri
               mountPath: /dev/dri
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
       volumes:
         - name: config
           persistentVolumeClaim:
